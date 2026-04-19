@@ -2537,6 +2537,11 @@ function initWorkGrid() {
         const thumb = document.createElement("div");
         thumb.className = "work-item__thumb";
         thumb.setAttribute("aria-hidden", "true");
+        if (project.thumbnail9x16) {
+            thumb.style.backgroundImage = `url(${project.thumbnail9x16})`;
+            thumb.style.backgroundSize = "cover";
+            thumb.style.backgroundPosition = "center";
+        }
 
         const meta = document.createElement("div");
         meta.className = "work-item__meta";

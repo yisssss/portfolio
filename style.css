@@ -345,7 +345,7 @@ body {
     width: 100%;
     box-sizing: border-box;
     background: transparent;
-    padding: 0px 64px 4px;
+    padding: 8px 64px 4px;
     font-size: 14px;
     line-height: 2;
     color: #e8261c;
@@ -850,26 +850,29 @@ body {
     width: 100%;
 }
 
-/* 개별 이미지 셀: 기본 4:3 */
+/* 개별 이미지 셀: 이미지 원본 비율 유지 */
 .img-block__img {
     width: 100%;
-    aspect-ratio: 4 / 3;
-    background: #d0cac2;
-    overflow: hidden;
+    background: #e2e2e2s;
 }
 
 .img-block__img img {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
+    height: auto;
     display: block;
 }
 
 /* hero 블록: 뷰포트 높이를 채우는 대형 이미지 */
-.img-block--hero .img-block__img {
-    aspect-ratio: unset;
+.img-block--hero .img-block__img img {
     height: calc(100vh - 200px);
+    object-fit: cover;
 }
+
+/* spacer */
+.img-block__spacer--sm  { height: 40px; }
+.img-block__spacer--md  { height: 80px; }
+.img-block__spacer--lg  { height: 160px; }
+.img-block__spacer--xl  { height: 240px; }
 
 /* ── 본문 설명 ── */
 .project-body-section {

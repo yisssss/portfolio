@@ -86,6 +86,14 @@ function renderImageBlocks(imageBlocks) {
     container.innerHTML = "";
 
     imageBlocks.forEach(block => {
+        // spacer 전용 처리
+        if (block.layout === "spacer") {
+            const spacer = document.createElement("div");
+            spacer.className = `img-block__spacer img-block__spacer--${block.size || "md"}`;
+            container.appendChild(spacer);
+            return;
+        }
+
         // 외부 래퍼: full-bleed vs padded
         const wrap = document.createElement("div");
         wrap.className = [
@@ -95,21 +103,76 @@ function renderImageBlocks(imageBlocks) {
         ].filter(Boolean).join(" ");
 
         // 이너 그리드
+        const count = block.count || 1;
         const grid = document.createElement("div");
-        grid.className = `img-block__grid img-block__grid--count-${block.count || 1}`;
-        grid.style.gridTemplateColumns = `repeat(${block.count || 1}, 1fr)`;
+        grid.className = `img-block__grid img-block__grid--count-${count}`;
 
-        const srcs = block.images || Array(block.count || 1).fill(null);
+        if (count > 1) {
+            grid.style.display = "flex";
+            grid.style.gap = "4px";
+            grid.style.alignItems = "flex-start";
+        } else {
+            grid.style.gridTemplateColumns = `repeat(${count}, 1fr)`;
+        }
+
+        const srcs = block.images || Array(count).fill(null);
         srcs.forEach(src => {
             const cell = document.createElement("div");
             cell.className = "img-block__img";
 
-            if (src) {
-                const img = document.createElement("img");
-                img.src  = src;
-                img.alt  = "";
-                img.loading = "lazy";
-                cell.appendChild(img);
+            if (count > 1) {
+                cell.style.flex = "1 1 0px";
+                cell.style.minWidth = "0";
+                cell.style.overflow = "hidden";
+            }
+
+            // "w:h" 형식 문자열 → 해당 비율의 빈 셀 (예: "1:1", "4:3", "16:9")
+            const ratioMatch = typeof src === "string" && src.match(/^(\d+(?:\.\d+)?):(\d+(?:\.\d+)?)$/);
+            if (ratioMatch) {
+                const ratio = parseFloat(ratioMatch[1]) / parseFloat(ratioMatch[2]);
+                cell.style.flex = `${ratio} 1 0px`;
+                cell.style.aspectRatio = src.replace(":", " / ");
+            } else if (src) {
+                const isVideo = /\.mp4$/i.test(src);
+
+                if (isVideo) {
+                    const video = document.createElement("video");
+                    video.src      = src;
+                    video.autoplay = true;
+                    video.loop     = true;
+                    video.muted    = true;
+                    video.playsInline = true;
+                    video.style.width  = "100%";
+                    video.style.height = "auto";
+                    video.style.display = "block";
+
+                    if (count > 1) {
+                        video.addEventListener("loadedmetadata", () => {
+                            if (video.videoWidth && video.videoHeight) {
+                                cell.style.flex = `${video.videoWidth / video.videoHeight} 1 0px`;
+                            }
+                        });
+                    }
+
+                    cell.appendChild(video);
+                } else {
+                    const img = document.createElement("img");
+                    img.src  = src;
+                    img.alt  = "";
+                    img.loading = "lazy";
+
+                    if (count > 1) {
+                        const applyRatio = () => {
+                            if (img.naturalWidth && img.naturalHeight) {
+                                cell.style.flex = `${img.naturalWidth / img.naturalHeight} 1 0px`;
+                            }
+                        };
+                        if (img.complete) applyRatio();
+                        else img.addEventListener("load", applyRatio);
+                    }
+
+                    cell.appendChild(img);
+                }
             }
             grid.appendChild(cell);
         });
@@ -179,16 +242,17 @@ function renderRelated(p) {
     const el = document.getElementById("proj-more");
     if (!el) return;
 
-    const myTags = p.tags || [];
-    const related = projects
-        .filter(proj => proj.id !== p.id && proj.tags?.some(t => myTags.includes(t)))
-        .slice(0, 2);
+    const idx = projects.findIndex(proj => proj.id === p.id);
+    const total = projects.length;
+    const prev = projects[(idx - 1 + total) % total];
+    const next = projects[(idx + 1) % total];
+    const related = [prev, next].filter(proj => proj && proj.id !== p.id);
 
     if (!related.length) return;
 
     const gridHtml = related.map(proj => `
         <a class="work-item" href="./project.html?id=${proj.id}">
-            <div class="work-item__thumb project-more__thumb"></div>
+            <div class="work-item__thumb project-more__thumb" ${proj.thumbnail16x9 ? `style="background-image:url(${proj.thumbnail16x9});background-size:cover;background-position:center;"` : ""}></div>
             <div class="work-item__meta">
                 <span class="work-item__title">${proj.title}</span>
                 <span class="work-item__year">${proj.year}</span>
