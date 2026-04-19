@@ -1,0 +1,11 @@
+# 시스템 파일
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 에디터
+.vscode/
+.idea/
+
+# 노드 (혹시 사용 시)
+node_modules/

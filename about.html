@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ABOUT — PARK SEJEONG</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body class="about-body">
+
+    <!-- 고정 헤더 -->
+    <header class="page-header" id="page-header">
+        <a href="./index.html" class="page-header__name">PARK SEJEONG</a>
+        <div class="page-header__right">
+            <nav class="page-header__nav" aria-label="Primary navigation">
+                <a href="./index.html#work" class="page-header__link" data-nav="work">WORK</a>
+                <p>,ㅤ</p>
+                <a href="./about.html" class="page-header__link page-header__link--active" data-nav="about">ABOUT</a>
+                <p>,ㅤ</p>
+                <a href="mailto:sjpark42@gmail.com" class="page-header__link" data-nav="contact">SAY HI</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="about-main">
+
+        <!-- SEJEONG SVG 네임 레터: 물리 엔진으로 조작됨 (about-scene.js) -->
+        <div class="about-letters" id="about-letter-layer" aria-hidden="true">
+            <div class="header-letter-row about-letter-row" id="about-letter-row">
+                <div class="header-letter-wrap"><img class="header-letter-img" src="./assets/svg/name/name1.svg" width="42"  height="112" alt=""></div>
+                <div class="header-letter-wrap"><img class="header-letter-img" src="./assets/svg/name/name2.svg" width="39"  height="110" alt=""></div>
+                <div class="header-letter-wrap"><img class="header-letter-img" src="./assets/svg/name/name3.svg" width="42"  height="111" alt=""></div>
+                <div class="header-letter-wrap"><img class="header-letter-img" src="./assets/svg/name/name4.svg" width="39"  height="110" alt=""></div>
+                <div class="header-letter-wrap"><img class="header-letter-img" src="./assets/svg/name/name5.svg" width="112" height="112" alt=""></div>
+                <div class="header-letter-wrap"><img class="header-letter-img" src="./assets/svg/name/name6.svg" width="42"  height="110" alt=""></div>
+                <div class="header-letter-wrap"><img class="header-letter-img" src="./assets/svg/name/name7.svg" width="105" height="112" alt=""></div>
+            </div>
+        </div>
+
+        <!-- 본문 그리드: 상단으로부터 286px 시작 -->
+        <section class="about-section">
+            <div class="about-grid">
+
+                <!-- Col 1: Contact info (14pt DM Mono) -->
+                <div class="about-contact">
+                    <p class="about-contact__block">
+                        CONTACT<br>
+                        <a href="mailto:sjpark42@gmail.com" class="about-contact__link">sjpark42@gmail.com</a><br>
+                        <a href="https://www.linkedin.com/in/sjpark42" target="_blank" rel="noopener" class="about-contact__link">linkedin.com</a>
+                    </p>
+                    <p class="about-contact__block">
+                        INSTAGRAM<br>
+                        <a href="https://instagram.com/___sj42" target="_blank" rel="noopener" class="about-contact__link">@___sj42</a>
+                    </p>
+                </div>
+
+                <!-- Col 2–3: 혼합 본문 텍스트 -->
+                <div class="about-body-col" id="about-col-left"></div>
+
+                <!-- Col 4–5: 혼합 본문 텍스트 -->
+                <div class="about-body-col" id="about-col-right"></div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/matter-js@0.20.0/build/matter.min.js"></script>
+    <script type="module" src="./typography.js"></script>
+    <script type="module" src="./about.js"></script>
+    <script type="module" src="./about-scene.js"></script>
+</body>
+</html>

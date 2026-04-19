@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PARK SEJEONG — Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+    <!-- ① 고정 헤더: 항상 최상단에 위치 -->
+    <header class="page-header" id="page-header">
+        <a href="./index.html" class="page-header__name">PARK SEJEONG</a>
+        <!-- col 2–4: 빈 공간 (그리드 gap으로 처리) -->
+        <div class="page-header__right">
+            <nav class="page-header__nav" aria-label="Primary navigation">
+                <a href="#work"    class="page-header__link" data-nav="work">WORK</a>
+                <p>,ㅤ</p>
+                <a href="./about.html" class="page-header__link" data-nav="about">ABOUT</a>
+                <p>,ㅤ</p>
+                <a href="mailto:sjpark42@gmail.com" class="page-header__link" data-nav="contact">SAY HI</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="page-main">
+
+        <!-- ② 히어로 섹션: Three.js 캔버스 + Matter.js 블롭 + SEJEONG 글자 -->
+        <section class="hero-section" id="hero" aria-label="Interactive hero">
+            <div id="scene-root" class="scene-root" aria-label="Interactive portfolio blobs">
+                <header class="site-header" aria-label="Site context">
+                    <div class="site-header__mid" aria-hidden="true"></div>
+                </header>
+                <svg id="boundary-layer" class="boundary-layer" aria-hidden="true"></svg>
+                <div id="dot-layer"   class="dot-layer"   aria-hidden="true"></div>
+                <div id="label-layer" class="label-layer" aria-hidden="true"></div>
+                <div id="header-letter-layer" class="header-letter-layer" aria-hidden="true">
+                    <div class="header-letter-row">
+                        <div class="header-letter-wrap" data-letter="S"><img class="header-letter-img" src="./assets/svg/name/name1.svg" width="42"  height="112" alt=""></div>
+                        <div class="header-letter-wrap" data-letter="E"><img class="header-letter-img" src="./assets/svg/name/name2.svg" width="39"  height="110" alt=""></div>
+                        <div class="header-letter-wrap" data-letter="J"><img class="header-letter-img" src="./assets/svg/name/name3.svg" width="42"  height="111" alt=""></div>
+                        <div class="header-letter-wrap" data-letter="E"><img class="header-letter-img" src="./assets/svg/name/name4.svg" width="39"  height="110" alt=""></div>
+                        <div class="header-letter-wrap" data-letter="O"><img class="header-letter-img" src="./assets/svg/name/name5.svg" width="112" height="112" alt=""></div>
+                        <div class="header-letter-wrap" data-letter="N"><img class="header-letter-img" src="./assets/svg/name/name6.svg" width="42"  height="110" alt=""></div>
+                        <div class="header-letter-wrap" data-letter="G"><img class="header-letter-img" src="./assets/svg/name/name7.svg" width="105" height="112" alt=""></div>
+                    </div>
+                </div>
+            </div><!-- /scene-root -->
+        </section><!-- /hero-section -->
+
+        <!-- ③ SERVICE FIELD sticky 바: 히어로 아래, 스크롤 시 상단 고정 헤더 바로 아래에 달라붙음 -->
+        <div class="service-field-bar" id="service-field-bar">
+            <div class="service-field__inner">
+                <span class="service-field__label">SERVICE FIELD</span>
+                <div class="tag-rail__chips" id="tag-rail-chips" role="list" aria-label="Filter tags"></div>
+                <p class="page-header__scroll-hint" aria-hidden="true">SCROLL FOR MORE <img src="./assets/svg/scroll arrow.svg" class="scroll-hint-arrow" alt=""></p>
+
+            </div>
+        </div>
+
+        <!-- ④ Work 섹션: 5단 그리드 프로젝트 목록 -->
+        <section class="work-section" id="work" aria-label="Work">
+            <div class="work-grid" id="work-grid"></div>
+
+            <!-- 푸터: 작업물로부터 600px 아래 -->
+            <footer class="work-footer">
+                <div class="work-footer__col1">
+                    <a href="mailto:sjpark42@gmail.com" class="work-footer__link">sjpark42@gmail.com</a>
+                    <a href="https://www.linkedin.com/in/sjpark42" target="_blank" rel="noopener" class="work-footer__link">linkedin.com</a>
+                </div>
+                <div class="work-footer__col5">© 2026</div>
+            </footer>
+        </section>
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/matter-js@0.20.0/build/matter.min.js"></script>
+    <script type="module" src="./typography.js"></script>
+    <script type="module" src="./main.js"></script>
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>— PARK SEJEONG</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body class="project-page-body">
+
+    <!-- 고정 헤더 -->
+    <header class="page-header" id="page-header">
+        <a href="./index.html" class="page-header__name">PARK SEJEONG</a>
+        <div class="page-header__right">
+            <nav class="page-header__nav" aria-label="Primary navigation">
+                <a href="./index.html#work" class="page-header__link page-header__link--active" data-nav="work">WORK</a>
+                <p>,ㅤ</p>
+                <a href="./about.html" class="page-header__link" data-nav="about">ABOUT</a>
+                <p>,ㅤ</p>
+                <a href="mailto:sjpark42@gmail.com" class="page-header__link" data-nav="contact">SAY HI</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="project-main">
+
+        <!-- ① 프로젝트 인트로: 메타 + 대형 SVG 타이틀 -->
+        <section class="project-intro">
+            <div class="project-intro__grid">
+
+                <!-- Col 1: 소형 메타 (JS가 채움) -->
+                <div class="project-meta-block" id="proj-meta-col1"></div>
+
+                <!-- Col 2–3: SVG 타이틀 (JS가 텍스트 삽입) -->
+                <svg class="project-title-xl" id="proj-title-svg"
+                     role="img" aria-label="" overflow="visible">
+                    <text class="project-title-xl__text"
+                          id="proj-title-text"
+                          x="0" y="0.88em"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"></text>
+                </svg>
+
+                <!-- Col 4: 연도 -->
+                <div class="project-meta-block" id="proj-meta-year"></div>
+
+                <!-- Col 5: 서비스 -->
+                <div class="project-meta-block" id="proj-meta-services"></div>
+
+            </div>
+        </section>
+
+        <!-- ② 이미지 블록 (JS가 동적으로 생성) -->
+        <div id="proj-image-blocks"></div>
+
+        <!-- ③ 본문 설명 -->
+        <section class="project-body-section">
+            <div class="project-body-grid">
+
+                <!-- Col 1: 메타 + 팀원 (JS가 채움) -->
+                <div class="project-side-meta" id="proj-side-meta"></div>
+
+                <!-- Col 2–3: 본문 텍스트 -->
+                <div class="project-desc-col text-body" id="proj-col-left"></div>
+
+                <!-- Col 4–5: 본문 텍스트 -->
+                <div class="project-desc-col text-body" id="proj-col-right"></div>
+
+            </div>
+        </section>
+
+        <!-- ④ 하단: 링크 + 관련 작업물 -->
+        <section class="project-links-section">
+            <div class="project-links-grid">
+                <a id="proj-visit-link" class="project-visit-link" href="#"
+                   target="_blank" rel="noopener" style="display:none"></a>
+                <div class="project-more" id="proj-more" style="display:none"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="work-footer project-page-footer">
+        <div class="work-footer__col1">
+            <a href="mailto:sjpark42@gmail.com" class="work-footer__link">sjpark42@gmail.com</a>
+            <a href="https://www.linkedin.com/in/sjpark42" target="_blank" rel="noopener" class="work-footer__link">linkedin.com</a>
+        </div>
+        <div class="work-footer__col5">© 2026</div>
+    </footer>
+
+    <script type="module" src="./renderProject.js"></script>
+</body>
+</html>
