@@ -65,9 +65,15 @@ function renderIntroMeta(p) {
     const colSvc = document.getElementById("proj-meta-services");
     if (colSvc) {
         const svcList = (p.services || p.tags || []).join(",<br>");
+        const teammateHtml = hasTeam
+            ? p.teammates
+                .map(name => `<p class="proj-value">${name}</p>`)
+                .join("")
+            : "";
         colSvc.innerHTML =
             `<p class="proj-label">SERVICES</p>
-             <p class="proj-value">${svcList}</p>`;
+             <p class="proj-value">${svcList}</p>
+             ${hasTeam ? `<div class="proj-mobile-teammates"><p class="proj-label">TEAMMATE</p>${teammateHtml}</div>` : ""}`;
     }
 }
 
@@ -78,14 +84,34 @@ function renderIntroMeta(p) {
 //    layout : "full-bleed" | "padded"   — 좌우 여백 유무
 //    hero   : true | false              — true 시 뷰포트 높이에 맞는 대형 이미지
 //    count  : 1 | 2 | 3                — 한 줄 이미지 개수
+//    fit    : "cover" | "ratio"        — ratio 시 원본 비율로 배치
 //    images : string[]                  — 이미지 경로 (없으면 null → 플레이스홀더)
 //  }
+
+function applyIntrinsicFlexRatio(cell, mediaEl) {
+    const apply = () => {
+        const w = mediaEl.naturalWidth || mediaEl.videoWidth;
+        const h = mediaEl.naturalHeight || mediaEl.videoHeight;
+
+        if (w && h) {
+            cell.style.flex = `${w / h} 1 0px`;
+        }
+    };
+
+    if (mediaEl.complete || mediaEl.readyState >= 1) {
+        apply();
+    } else {
+        mediaEl.addEventListener("load", apply, {once: true});
+        mediaEl.addEventListener("loadedmetadata", apply, {once: true});
+    }
+}
+
 function renderImageBlocks(imageBlocks) {
     const container = document.getElementById("proj-image-blocks");
     if (!container) return;
     container.innerHTML = "";
 
-    imageBlocks.forEach(block => {
+    imageBlocks.forEach((block, blockIndex) => {
         // spacer 전용 처리
         if (block.layout === "spacer") {
             const spacer = document.createElement("div");
@@ -94,44 +120,56 @@ function renderImageBlocks(imageBlocks) {
             return;
         }
 
+        const firstVisualBlock = blockIndex === 0;
+        const firstVisualSrc = firstVisualBlock
+            ? (block.images || []).find(src => typeof src === "string" && !src.match(/^(\d+(?:\.\d+)?):(\d+(?:\.\d+)?)$/))
+            : null;
+        const useRatioFit = block.fit !== "cover";
+
         // 외부 래퍼: full-bleed vs padded
         const wrap = document.createElement("div");
         wrap.className = [
             "img-block",
-            `img-block--${block.layout || "full-bleed"}`,
-            block.hero ? "img-block--hero" : ""
+            `img-block--${firstVisualBlock ? "full-bleed" : block.layout || "full-bleed"}`,
+            block.hero ? "img-block--hero" : "",
+            firstVisualBlock ? "img-block--first" : "",
+            useRatioFit ? "img-block--fit-ratio" : "img-block--fit-cover"
         ].filter(Boolean).join(" ");
 
         // 이너 그리드
-        const count = block.count || 1;
+        const count = firstVisualBlock ? 1 : block.count || 1;
         const grid = document.createElement("div");
         grid.className = `img-block__grid img-block__grid--count-${count}`;
 
-        if (count > 1) {
+        if (count > 1 && useRatioFit) {
             grid.style.display = "flex";
             grid.style.gap = "4px";
             grid.style.alignItems = "flex-start";
+        } else if (count > 1) {
+            grid.style.gap = "4px";
+            grid.style.gridTemplateColumns = `repeat(${count}, minmax(0, 1fr))`;
         } else {
             grid.style.gridTemplateColumns = `repeat(${count}, 1fr)`;
         }
 
-        const srcs = block.images || Array(count).fill(null);
+        const srcs = firstVisualBlock ? [firstVisualSrc] : block.images || Array(count).fill(null);
         srcs.forEach(src => {
             const cell = document.createElement("div");
             cell.className = "img-block__img";
 
-            if (count > 1) {
+            if (count > 1 && useRatioFit) {
                 cell.style.flex = "1 1 0px";
                 cell.style.minWidth = "0";
-                cell.style.overflow = "hidden";
             }
 
             // "w:h" 형식 문자열 → 해당 비율의 빈 셀 (예: "1:1", "4:3", "16:9")
             const ratioMatch = typeof src === "string" && src.match(/^(\d+(?:\.\d+)?):(\d+(?:\.\d+)?)$/);
             if (ratioMatch) {
-                const ratio = parseFloat(ratioMatch[1]) / parseFloat(ratioMatch[2]);
-                cell.style.flex = `${ratio} 1 0px`;
                 cell.style.aspectRatio = src.replace(":", " / ");
+                if (count > 1 && useRatioFit) {
+                    const ratio = parseFloat(ratioMatch[1]) / parseFloat(ratioMatch[2]);
+                    cell.style.flex = `${ratio} 1 0px`;
+                }
             } else if (src) {
                 const isVideo = /\.mp4$/i.test(src);
 
@@ -142,36 +180,23 @@ function renderImageBlocks(imageBlocks) {
                     video.loop     = true;
                     video.muted    = true;
                     video.playsInline = true;
-                    video.style.width  = "100%";
-                    video.style.height = "auto";
-                    video.style.display = "block";
-
-                    if (count > 1) {
-                        video.addEventListener("loadedmetadata", () => {
-                            if (video.videoWidth && video.videoHeight) {
-                                cell.style.flex = `${video.videoWidth / video.videoHeight} 1 0px`;
-                            }
-                        });
-                    }
 
                     cell.appendChild(video);
+
+                    if (count > 1 && useRatioFit) {
+                        applyIntrinsicFlexRatio(cell, video);
+                    }
                 } else {
                     const img = document.createElement("img");
                     img.src  = src;
                     img.alt  = "";
                     img.loading = "lazy";
 
-                    if (count > 1) {
-                        const applyRatio = () => {
-                            if (img.naturalWidth && img.naturalHeight) {
-                                cell.style.flex = `${img.naturalWidth / img.naturalHeight} 1 0px`;
-                            }
-                        };
-                        if (img.complete) applyRatio();
-                        else img.addEventListener("load", applyRatio);
-                    }
-
                     cell.appendChild(img);
+
+                    if (count > 1 && useRatioFit) {
+                        applyIntrinsicFlexRatio(cell, img);
+                    }
                 }
             }
             grid.appendChild(cell);
@@ -200,7 +225,7 @@ function renderSideMeta(p) {
         const names = p.teammates
             .map(name => `<p class="proj-value">${name}</p>`)
             .join("");
-        html += `<div><p class="proj-label">TEAMMATE</p>${names}</div>`;
+        html += `<div class="project-side-meta__teammates"><p class="proj-label">TEAMMATE</p>${names}</div>`;
     }
 
     el.innerHTML = html;

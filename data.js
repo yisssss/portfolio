@@ -213,6 +213,7 @@ export function getMergedShaderVisual(tagKey) {
 //    layout : "full-bleed" | "padded" | "spacer"  (spacer 시 size: "sm"|"md"|"lg"|"xl" 로 높이 지정)
 //    hero   : boolean        — true → 뷰포트 높이 꽉 차는 대형 이미지
 //    count  : 1 | 2 | 3     — 한 줄 이미지 개수
+//    fit    : "cover" | "ratio" — ratio(기본): 원본 비율 반영 / cover: 동일 칸 크기·크롭
 //    images : (string|null)[] — 이미지 경로. null → 회색 플레이스홀더, "w:h" → 해당 비율 공백 (예: "1:1", "4:3")
 //  websiteLink string|null   — 외부 링크 (없으면 null → VISIT 버튼 숨김)
 //  url         string        — 워크 그리드 클릭 시 이동할 경로
@@ -233,9 +234,11 @@ export const projects = [
             { layout: "spacer", size: "xl" },
             { layout: "padded", hero: false, count: 2, images: ["./projects/32TEETH/3.jpg","./projects/32TEETH/4.jpg"] },
             { layout: "padded", hero: false, count: 3, images: ["./projects/32TEETH/5.jpg","./projects/32TEETH/6.jpg", "./projects/32TEETH/7.jpg"] },
-            { layout: "padded", hero: false, count: 2, images: ["./projects/32TEETH/8.png", "./projects/32TEETH/9.png"] },
+            { layout: "padded", hero: false, count: 3, images: ["1:2","./projects/32TEETH/8.png", "./projects/32TEETH/9.png"] },
             { layout: "spacer", size: "xl" },
-            { layout: "full-bleed", hero: false, count: 2, images: ["./projects/32TEETH/11.jpg", "./projects/32TEETH/12.jpg"] },
+            { layout: "full-bleed", hero: false, count: 2, images: ["./projects/32TEETH/12.jpg", "./projects/32TEETH/11.jpg"] },
+            { layout: "full-bleed", hero: false, count: 1, images: ["./projects/32TEETH/10.jpg"] },
+
         ],
         thumbnail16x9: "./projects/32TEETH/thumb.jpg",
         thumbnail9x16: "./projects/32TEETH/thumb2.jpg",
@@ -277,10 +280,10 @@ export const projects = [
         content:     { leftCol: ["2025 SNU PATCHWORK 전시에 디자인 소모임 GRAPH 팀으로 참여했다. '여름 파티'라는 테마 아래, 관객을 환영하는 다양한 형태의 ‘초대장’을 비주얼 모티프로 설정하여 전시 전반의 아이덴티티를 구축했다. 전시 준비위원회로서 아이덴티티 기획부터 동선 설계, 참여자 9인의 작품 디스플레이까지 전시의 전 과정을 조율하며 다양한 색깔이 넘치는 작품에 한 팀이라는 통일성을 부여하기 위해 노력했다.", "기존의 종이 도록을 대신하여 각 작품의 상세 정보를 담은 인터랙티브 캡션 웹사이트를 직접 제작하고 퍼블리싱했다. 이는 전시의 디지털 아카이브로 이어졌다."], rightCol: ["I participated in the 2025 SNU PATCHWORK exhibition as a member of the design group 'GRAPH.' Under the theme of a Summer Party, I established the overall exhibition identity by utilizing various forms of 'invitations' as the core visual motif. As a member of the organizing committee, I coordinated the entire process—from visual branding and spatial flow planning to the final display of works by nine different artists—striving to provide a unified team identity to a diverse collection of individual styles.", "A key part of this project was the development and publishing of an interactive caption website that replaced traditional printed catalogs. I designed the website's structure and layout to mirror the physical exhibition's flow, which naturally extended into a permanent digital archive. By bridging the gap between physical and digital spaces, I offered visitors a seamless and tech-driven viewing experience."] },
         imageBlocks: [
             { layout: "full-bleed", hero: true,  count: 1, images: ["./projects/graph-pw/thumb2.jpg"] },
-            { layout: "spacer", size: "xl" },
-            { layout: "padded", hero: false, count: 3, images: ["1:1", "./projects/graph-pw/1.jpg", "1:1"] },
-            { layout: "padded", hero: false, count: 2, images: ["./projects/graph-pw/2.jpg", "./projects/graph-pw/3.jpg"] },
-            { layout: "padded", hero: false, count: 3, images: ["./projects/graph-pw/4.jpeg", "./projects/graph-pw/5.jpeg", "./projects/graph-pw/6.jpeg"] },
+            { layout: "spacer", size: "lg" },
+            { layout: "padded", hero: false, count: 3, images: ["./projects/graph-pw/2.jpg", "./projects/graph-pw/1.jpg", "./projects/graph-pw/3.jpg"] },
+            { layout: "padded", hero: false, count: 4, fit: "ratio", images: ["./projects/graph-pw/4.jpeg", "./projects/graph-pw/5.jpeg", "./projects/graph-pw/6.jpeg", "./projects/graph-pw/7.jpeg"]},
+
         ],
         thumbnail16x9: "./projects/graph-pw/thumb2.jpg",
         thumbnail9x16: "./projects/graph-pw/thumb.jpg",

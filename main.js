@@ -26,8 +26,21 @@ const {
 const MAX_BLOBS = 24;
 const MAX_TAGS_PER_BLOB = 5;
 const MAX_TAG_GROUPS = TAG_KEYS.length;
+const MOBILE_MEDIA_QUERY = "(max-width: 767px) and (pointer: coarse)";
+
+function isMobileLayout() {
+    return window.matchMedia(MOBILE_MEDIA_QUERY).matches;
+}
+
+function isTouchInteractionLayout() {
+    return isMobileLayout() || window.matchMedia("(pointer: coarse)").matches;
+}
+
+/** 모바일에서는 메타볼 랜딩(Three.js/Matter.js)을 끄고 작업물 목록만 보여준다. */
+const HERO_ENABLED = !isMobileLayout();
+
 /** 블롭 물리 반지름(px). Matter 원 크기·메타볼 기여도에 직접 영향. */
-const BLOB_RADIUS = 48;
+const BLOB_RADIUS = isMobileLayout() ? 32 : 48;
 /**
  * 보이는 캔버스보다 안쪽에 물리 벽을 둬서, 화면 밖으로 나가기 전에 실제 충돌로 튕기게 만든다.
  * 좌우/하단은 넉넉히, 상단은 헤더 row 위치를 건드리지 않도록 작게 유지.
@@ -43,6 +56,8 @@ const PIXEL_CELL_SIZE = 10;
 const CLICK_MOVE_THRESHOLD = 8;
 const CLICK_TIME_THRESHOLD = 220;
 const PHYSICS_TIMESTEP = 1000 / 60;
+const RENDER_PIXEL_RATIO_LIMIT = 1.35;
+const BOUNDARY_SYNC_INTERVAL = 1000 / 15;
 const CONTOUR_GRID_SIZE = 18;
 const CONTOUR_THRESHOLD = 0.9;
 const CONTOUR_PADDING = 128;
@@ -113,9 +128,17 @@ const boundaryLayer = document.querySelector("#boundary-layer");
 const dotLayer = document.querySelector("#dot-layer");
 const labelLayer = document.querySelector("#label-layer");
 
+function getSceneViewportSize() {
+    const rect = sceneRoot.getBoundingClientRect();
+
+    return {
+        width: Math.max(1, Math.round(rect.width || window.innerWidth)),
+        height: Math.max(1, Math.round(rect.height || window.innerHeight))
+    };
+}
+
 const viewport = {
-    width: window.innerWidth,
-    height: window.innerHeight
+    ...getSceneViewportSize()
 };
 
 const engine = Engine.create({
@@ -139,16 +162,20 @@ const state = {
         startY: 0,
         isDown: false,
         targetBlob: null,
-        targetHeaderHit: null
+        targetHeaderHit: null,
+        capturedPointerId: null
     }
 };
 
 const renderer = new THREE.WebGLRenderer({antialias: true, alpha: true});
 
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, RENDER_PIXEL_RATIO_LIMIT));
 renderer.setSize(viewport.width, viewport.height);
 renderer.domElement.setAttribute("aria-label", "2D metaball renderer");
-sceneRoot.prepend(renderer.domElement);
+
+if (HERO_ENABLED) {
+    sceneRoot.prepend(renderer.domElement);
+}
 
 const scene = new THREE.Scene();
 const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
@@ -557,7 +584,8 @@ const metaballMaterial = new THREE.ShaderMaterial({transparent: true, uniforms: 
         }
 
         void main() {
-            vec2 point = vec2(gl_FragCoord.x, gl_FragCoord.y);
+            // CSS/물리 좌표와 동일한 논리 픽셀 (devicePixelRatio·버퍼 크기와 무관)
+            vec2 point = vUv * uResolution;
             vec2 screenUv = vUv;
             vec2 pixelPoint = floor(point / PIXEL_CELL_SIZE) * PIXEL_CELL_SIZE;
             vec2 pixelUv = pixelPoint / uResolution;
@@ -689,7 +717,7 @@ const metaballMaterial = new THREE.ShaderMaterial({transparent: true, uniforms: 
             float shapeMask = max(maxBaseMask, max(checkerSilhouetteMask, max(crossMask, halftoneMask)));
             float alpha = compositeMask * shapeMask;
 
-            float grain = hash12(gl_FragCoord.xy * 0.71 + vec2(11.0, 29.0));
+            float grain = hash12(point * 0.71 + vec2(11.0, 29.0));
             finalRgb += (grain - 0.5) * 2.0 * uFilmGrainStrength * clamp(shapeMask, 0.0, 1.0);
             finalRgb = clamp(finalRgb, 0.0, 1.0);
 
@@ -701,16 +729,80 @@ const metaballMaterial = new THREE.ShaderMaterial({transparent: true, uniforms: 
 const metaballPlane = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), metaballMaterial);
 scene.add(metaballPlane);
 
-initBoundaries();
-initWorld();
-initBlobs();
-initLabels();
-initMouse();
+if (HERO_ENABLED) {
+    initBoundaries();
+    initWorld();
+    initBlobs();
+    initLabels();
+    initMouse();
+    scheduleInitHeaderPhysics();
+}
+
 initSiteChrome();
-scheduleInitHeaderPhysics();
 
 let lastFrame = performance.now();
-requestAnimationFrame(animate);
+let lastBoundarySync = 0;
+
+if (HERO_ENABLED) {
+    requestAnimationFrame(animate);
+} else {
+    initMobileHero();
+}
+
+/**
+ * 모바일 랜딩: WebGL 메타볼 없이 about 페이지와 동일한 SEJEONG 글자 물리만 구동한다.
+ * Matter.js만 사용하므로 가볍고, 글자 드래그 인터랙션이 가능하다.
+ */
+function initMobileHero() {
+    const overlay = document.createElement("div");
+
+    overlay.className = "hero-touch-overlay";
+    overlay.style.cssText = "position:absolute;inset:0;z-index:6;background:transparent;";
+    sceneRoot.appendChild(overlay);
+
+    const mouse = Mouse.create(overlay);
+    const mouseConstraint = MouseConstraint.create(engine, {
+        mouse,
+        constraint: {
+            stiffness: 0.22,
+            damping: 0.09,
+            angularStiffness: 0,
+            render: {
+                visible: false
+            }
+        }
+    });
+
+    Composite.add(engine.world, mouseConstraint);
+
+    // 휠/터치 스크롤은 페이지로 전달(드래그는 글자에만 작용)
+    overlay.removeEventListener("mousewheel", mouse.mousewheel);
+    overlay.removeEventListener("DOMMouseScroll", mouse.mousewheel);
+    overlay.removeEventListener("touchmove", mouse.touchmove);
+    overlay.addEventListener("touchmove", mouse.touchmove, { passive: true });
+    overlay.addEventListener("wheel", (e) => {
+        window.scrollBy({ top: e.deltaY, left: e.deltaX });
+    }, { passive: true });
+
+    Events.on(engine, "beforeUpdate", (event) => {
+        applyHeaderLetterDrift(event.timestamp);
+        applyHeaderLetterAnchorPullX();
+        applyHeaderLetterSoftBandPull();
+    });
+
+    scheduleInitHeaderPhysics();
+
+    lastFrame = performance.now();
+    requestAnimationFrame(function mobileHeroLoop(now) {
+        const delta = Math.min(now - lastFrame, 32);
+        lastFrame = now;
+
+        Engine.update(engine, delta || PHYSICS_TIMESTEP);
+        syncHeaderLetters();
+
+        requestAnimationFrame(mobileHeroLoop);
+    });
+}
 
 function initWorld() {
     rebuildWalls();
@@ -807,7 +899,36 @@ function initBoundaries() {
     });
 }
 
+function hasHeroPointerTarget(blob, headerHit) {
+    return Boolean(blob || headerHit);
+}
+
+/** 터치(아이패드 등): 빈 영역은 pan-y로 페이지 스크롤, blob/글자만 none+capture */
+function setHeroCanvasTouchScrollMode(allowPageScroll) {
+    if (!isTouchInteractionLayout()) {
+        return;
+    }
+
+    renderer.domElement.style.touchAction = allowPageScroll ? "pan-y" : "none";
+}
+
+function releaseHeroPointerCapture() {
+    if (state.pointer.capturedPointerId == null || !renderer.domElement.releasePointerCapture) {
+        state.pointer.capturedPointerId = null;
+        return;
+    }
+
+    try {
+        renderer.domElement.releasePointerCapture(state.pointer.capturedPointerId);
+    } catch {
+        // 캡처되지 않은 포인터 해제 예외는 무시한다.
+    }
+
+    state.pointer.capturedPointerId = null;
+}
+
 function initMouse() {
+    const touchInteraction = isTouchInteractionLayout();
     const mouse = Mouse.create(renderer.domElement);
     const mouseConstraint = MouseConstraint.create(engine, {
         mouse,
@@ -822,14 +943,17 @@ function initMouse() {
     });
 
     Composite.add(engine.world, mouseConstraint);
+    setHeroCanvasTouchScrollMode(true);
 
     // Matter.js의 스크롤 차단 이벤트 핸들러 전부 제거 후 passive로 재등록
     renderer.domElement.removeEventListener("mousewheel", mouse.mousewheel);
     renderer.domElement.removeEventListener("DOMMouseScroll", mouse.mousewheel);
 
-    // touchmove: passive:false + preventDefault()가 트랙패드 스크롤까지 차단 → passive로 재등록
+    // touchmove: passive:false + preventDefault()가 페이지 스크롤까지 차단 → 터치는 passive
     renderer.domElement.removeEventListener("touchmove", mouse.touchmove);
-    renderer.domElement.addEventListener("touchmove", mouse.touchmove, { passive: true });
+    renderer.domElement.addEventListener("touchmove", mouse.touchmove, {
+        passive: true
+    });
 
     // canvas 위에서의 wheel 이벤트를 window 스크롤로 수동 전달
     renderer.domElement.addEventListener("wheel", (e) => {
@@ -845,6 +969,20 @@ function initMouse() {
         const point = toScenePoint(event);
         const hit = getBlobAtPoint(point);
         const headerHit = getHeaderLetterAtPoint(point);
+        const interactiveTarget = hasHeroPointerTarget(hit, headerHit);
+
+        if (touchInteraction) {
+            setHeroCanvasTouchScrollMode(!interactiveTarget);
+
+            if (interactiveTarget && renderer.domElement.setPointerCapture) {
+                try {
+                    renderer.domElement.setPointerCapture(event.pointerId);
+                    state.pointer.capturedPointerId = event.pointerId;
+                } catch {
+                    // 일부 모바일 브라우저는 캡처 가능한 포인터가 아닐 때 예외를 던진다.
+                }
+            }
+        }
 
         state.pointer.isDown = true;
         state.pointer.downAt = performance.now();
@@ -858,6 +996,9 @@ function initMouse() {
         if (! state.pointer.isDown) {
             return;
         }
+
+        releaseHeroPointerCapture();
+        setHeroCanvasTouchScrollMode(true);
 
         const elapsed = performance.now() - state.pointer.downAt;
         const distance = Math.hypot(event.clientX - state.pointer.startX, event.clientY - state.pointer.startY,);
@@ -898,7 +1039,7 @@ function animate(now) {
     syncMetaballs();
     syncLabels();
     syncHeaderLetters();
-    syncBoundaries();
+    syncBoundaries(now);
     renderer.render(scene, camera);
 
     requestAnimationFrame(animate);
@@ -1018,7 +1159,9 @@ function initHeaderPhysics() {
     });
     void row.offsetHeight;
 
-    const canvasRect = renderer.domElement.getBoundingClientRect();
+    // 데스크톱에선 캔버스가 scene-root를 가득 채우므로 동일하고,
+    // 모바일(캔버스 미부착)에서도 유효하도록 scene-root 기준으로 좌표를 잡는다.
+    const canvasRect = sceneRoot.getBoundingClientRect();
 
     const placements = wraps.map((wrap) => {
         const r = wrap.getBoundingClientRect();
@@ -1081,9 +1224,11 @@ function initHeaderPhysics() {
 }
 
 function syncHeaderLetters() {
+    const mobileYOffset = isMobileLayout() ? 96 : 0;
+
     state.headerLetters.forEach(({body, wrap}) => {
         wrap.style.left = `${body.position.x}px`;
-        wrap.style.top = `${body.position.y}px`;
+        wrap.style.top = `${body.position.y + mobileYOffset}px`;
         wrap.style.transform = `translate(-50%, -50%) rotate(${body.angle}rad)`;
     });
 }
@@ -1214,7 +1359,13 @@ function applyHeaderLetterSoftBandPull() {
     });
 }
 
-function syncBoundaries() {
+function syncBoundaries(now = performance.now(), force = false) {
+    if (!force && now - lastBoundarySync < BOUNDARY_SYNC_INTERVAL) {
+        return;
+    }
+
+    lastBoundarySync = now;
+
     getAllTags().forEach((tag) => {
         const group = state.boundaryPaths.get(tag);
         const members = state.blobs.filter((blob) => blob.project.tags.includes(tag) && !blob.isMasked);
@@ -1224,7 +1375,12 @@ function syncBoundaries() {
             lineStroke: visual.line.stroke
         };
 
-        if (! group || members.length === 0) {
+        if (! group) {
+            return;
+        }
+
+        if (members.length === 0) {
+            renderBoundaryContours(group, [], config);
             return;
         }
 
@@ -1430,11 +1586,18 @@ function rebuildWalls() {
 }
 
 function handleResize() {
-    viewport.width = window.innerWidth;
-    viewport.height = window.innerHeight;
+    const nextViewport = getSceneViewportSize();
+
+    if (nextViewport.width === viewport.width && nextViewport.height === viewport.height) {
+        return;
+    }
+
+    viewport.width = nextViewport.width;
+    viewport.height = nextViewport.height;
 
     destroyHeaderPhysics();
 
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, RENDER_PIXEL_RATIO_LIMIT));
     renderer.setSize(viewport.width, viewport.height);
     metaballUniforms.uResolution.value.set(viewport.width, viewport.height);
     boundaryLayer.setAttribute("viewBox", `0 0 ${
@@ -1444,6 +1607,7 @@ function handleResize() {
     }`);
     rebuildWalls();
     scheduleInitHeaderPhysics();
+    syncBoundaries(performance.now(), true);
 }
 
 function getBlobAtPoint(point) {
@@ -1459,13 +1623,17 @@ function getBlobAtPoint(point) {
 
 function toScenePoint(event) {
     const rect = renderer.domElement.getBoundingClientRect();
+    const sx = rect.width > 0 ? viewport.width / rect.width : 1;
+    const sy = rect.height > 0 ? viewport.height / rect.height : 1;
     return {
-        x: event.clientX - rect.left,
-        y: event.clientY - rect.top
+        x: (event.clientX - rect.left) * sx,
+        y: (event.clientY - rect.top) * sy
     };
 }
 
 function resetPointerState() {
+    releaseHeroPointerCapture();
+    setHeroCanvasTouchScrollMode(true);
     state.pointer.isDown = false;
     state.pointer.targetBlob = null;
     state.pointer.targetHeaderHit = null;
@@ -2274,6 +2442,7 @@ function setFilter(tag) {
 
     updateTagChipActiveState(state.activeFilter);
     updateWorkGrid(state.activeFilter);
+    syncBoundaries(performance.now(), true);
 }
 
 /**
@@ -2554,7 +2723,11 @@ function initWorkGrid() {
         yearEl.className = "work-item__year";
         yearEl.textContent = project.year || "";
 
-        meta.append(titleEl, yearEl);
+        const servicesEl = document.createElement("span");
+        servicesEl.className = "work-item__services";
+        servicesEl.textContent = (project.services || project.tags || []).join(", ");
+
+        meta.append(titleEl, yearEl, servicesEl);
 
         const subtitleEl = document.createElement("p");
         subtitleEl.className = "work-item__subtitle";

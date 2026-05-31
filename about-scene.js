@@ -148,9 +148,12 @@ function initLetters() {
 
 /* ── DOM 동기화 ── */
 function syncLetters() {
+    const scrollY = window.scrollY || window.pageYOffset || 0;
+    const mobileYOffset = window.matchMedia("(max-width: 767px) and (pointer: coarse)").matches ? 96 : 0;
+
     letters.forEach(({ body, wrap }) => {
         wrap.style.left      = `${body.position.x}px`;
-        wrap.style.top       = `${body.position.y}px`;
+        wrap.style.top       = `${body.position.y - scrollY + mobileYOffset}px`;
         wrap.style.transform = `translate(-50%, -50%) rotate(${body.angle}rad)`;
     });
 }
