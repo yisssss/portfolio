@@ -257,7 +257,7 @@ export const projects = [
         teammates:   null,
         content:     { leftCol: ["H는 사라진 금요일 엄마를 찾아 방향을 틀거나 꺾고, 흩어지거나 진동하며 사각의 프레임 밖으로 달려 나간다."], rightCol: ["H turns or bends, scatters or vibrates, running out of the square frame in search of the Friday mother."] },
         imageBlocks: [
-            { layout: "full-bleed", hero: true,  count: 1, images: ["./projects/yeolmu/1.jpg"] },
+            { layout: "full-bleed", hero: true,  count: 1, images: ["./projects/yeolmu/1.png"] },
             { layout: "padded", hero: false, count: 1, images: ["./projects/yeolmu/5.jpg"] },
             { layout: "padded", hero: false, count: 2, images: ["./projects/yeolmu/3.JPG", "./projects/yeolmu/4.JPG"] },
             { layout: "full-bleed", hero: false, count: 1, images: ["./projects/yeolmu/2.jpg"] },
