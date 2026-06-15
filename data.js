@@ -226,7 +226,7 @@ export const projects = [
         category:   "절차적 예술 기반 브랜드 비주얼 실험",
         subtitle:    "절차적 예술 기반 브랜드 비주얼 실험",
         year:        "2026",
-        tags:        ["identity", "editorial", "website", "creative-coding"],
+        tags:        ["identity", "graphic", "editorial", "website", "creative-coding"],
         teammates:   null,
         content:     { leftCol: ["타래tarae는 라이프스타일 인테리어 오브제 브랜드다. 사용자가 자신의 공간과 필요에 맞게 두 손으로 직접 굽히고 조율하여 가구의 형태를 완성하도록 한다. 타래는 자신의 공간을 스스로 꾸미고자 하는 사용자에게 선택지가 아닌 재료를 제안한다.","미디어파이프(MediaPipe) 라이브러리로 손의 움직임을 추적하고, p5.js와 Three.js를 활용해 그 궤적을 브랜드 키비주얼 '타래'로 시각화했다. 무형의 디지털 코드와 아날로그적인 인간의 손, 그리고 물리적인 실리콘 가구를 하나의 논리로 엮어내려고 시도하며, 웹사이트 상에서 실시간 인터랙션이 가능한 그래픽을 만들어 보았다."], rightCol: ["tarae is a lifestyle interior object brand. It allows users to complete the form of furniture by bending and adjusting it with their own hands according to their space and needs. tarae suggests materials, not just options, to users who wish to composite their own space.","By tracking hand movements in with MediaPipe library, I utilized p5.js and Three.js to visualize these trajectories into 'tarae', our brand's key visual. Seeking to weave the intangible digital code, the analog human hand, and physical silicone furniture into a single unified logic, I developed real-time interactive graphics directly on the web."] },
         imageBlocks: [
