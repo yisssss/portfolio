@@ -219,6 +219,33 @@ export function getMergedShaderVisual(tagKey) {
 //  url         string        — 워크 그리드 클릭 시 이동할 경로
 // ─────────────────────────────────────────────────────────────────────────────
 export const projects = [
+    
+    {
+        id:          "tarae",
+        title:       "TARAE",
+        category:   "절차적 예술 기반 브랜드 비주얼 실험",
+        subtitle:    "절차적 예술 기반 브랜드 비주얼 실험",
+        year:        "2026",
+        tags:        ["identity", "editorial", "website", "creative-coding"],
+        teammates:   null,
+        content:     { leftCol: ["타래tarae는 라이프스타일 인테리어 오브제 브랜드다. 사용자가 자신의 공간과 필요에 맞게 두 손으로 직접 굽히고 조율하여 가구의 형태를 완성하도록 한다. 타래는 자신의 공간을 스스로 꾸미고자 하는 사용자에게 선택지가 아닌 재료를 제안한다.","미디어파이프(MediaPipe) 라이브러리로 손의 움직임을 추적하고, p5.js와 Three.js를 활용해 그 궤적을 브랜드 키비주얼 '타래'로 시각화했다. 무형의 디지털 코드와 아날로그적인 인간의 손, 그리고 물리적인 실리콘 가구를 하나의 논리로 엮어내려고 시도하며, 웹사이트 상에서 실시간 인터랙션이 가능한 그래픽을 만들어 보았다."], rightCol: ["tarae is a lifestyle interior object brand. It allows users to complete the form of furniture by bending and adjusting it with their own hands according to their space and needs. tarae suggests materials, not just options, to users who wish to composite their own space.","By tracking hand movements in with MediaPipe library, I utilized p5.js and Three.js to visualize these trajectories into 'tarae', our brand's key visual. Seeking to weave the intangible digital code, the analog human hand, and physical silicone furniture into a single unified logic, I developed real-time interactive graphics directly on the web."] },
+        imageBlocks: [
+            { layout: "full-bleed", hero: true,  count: 1, images: ["./projects/tarae/1.png"] },
+            { layout: "full-bleed", hero: false, count: 1, images: ["./projects/tarae/7.png"] },
+            { layout: "spacer", size: "xl" },
+            { layout: "full-bleed", hero: false,  count: 3, images: ["1:2", "./projects/tarae/handtest.gif", "1:2"] },
+            { layout: "spacer", size: "xl" },
+
+            { layout: "full-bleed", hero: false, count: 2, images: ["./projects/tarae/2.png","./projects/tarae/3.png"] },
+            { layout: "full-bleed", hero: false, count: 2, images: ["./projects/tarae/6.png","./projects/tarae/4.png"] },
+
+        ],
+        thumbnail16x9: "./projects/tarae/thumb2.png",
+        thumbnail9x16: "./projects/tarae/thumb.png",
+        websiteLink: "https://meet-tarae.vercel.app/",
+        url:         "./project.html?id=tarae"
+    },
+
     {
         id:          "32teeth",
         title:       "32 TEE TH",
@@ -234,7 +261,7 @@ export const projects = [
             { layout: "spacer", size: "xl" },
             { layout: "padded", hero: false, count: 2, images: ["./projects/32TEETH/3.jpg","./projects/32TEETH/4.jpg"] },
             { layout: "padded", hero: false, count: 3, images: ["./projects/32TEETH/5.jpg","./projects/32TEETH/6.jpg", "./projects/32TEETH/7.jpg"] },
-            { layout: "padded", hero: false, count: 3, images: ["1:2","./projects/32TEETH/8.png", "./projects/32TEETH/9.png"] },
+            { layout: "padded", hero: false, count: 3, images: ["./projects/32TEETH/9.png", "./projects/32TEETH/8.png", "./projects/32TEETH/13.jpg"] },
             { layout: "spacer", size: "xl" },
             { layout: "full-bleed", hero: false, count: 2, images: ["./projects/32TEETH/12.jpg", "./projects/32TEETH/11.jpg"] },
             { layout: "full-bleed", hero: false, count: 1, images: ["./projects/32TEETH/10.jpg"] },
@@ -258,9 +285,8 @@ export const projects = [
         content:     { leftCol: ["H는 사라진 금요일 엄마를 찾아 방향을 틀거나 꺾고, 흩어지거나 진동하며 사각의 프레임 밖으로 달려 나간다."], rightCol: ["H turns or bends, scatters or vibrates, running out of the square frame in search of the Friday mother."] },
         imageBlocks: [
             { layout: "full-bleed", hero: true,  count: 1, images: ["./projects/yeolmu/1.png"] },
-            { layout: "padded", hero: false, count: 1, images: ["./projects/yeolmu/5.jpg"] },
             { layout: "padded", hero: false, count: 2, images: ["./projects/yeolmu/3.JPG", "./projects/yeolmu/4.JPG"] },
-            { layout: "full-bleed", hero: false, count: 1, images: ["./projects/yeolmu/2.jpg"] },
+            { layout: "padded", hero: false, count: 1, images: ["./projects/yeolmu/2.jpg"] },
         ],
         thumbnail16x9: "./projects/yeolmu/thumb2.jpg",
         thumbnail9x16: "./projects/yeolmu/thumb.jpg",
@@ -292,25 +318,30 @@ export const projects = [
     },
     
     
-    {
-        id:          "grandma",
-        title:       "GRANDMOTHER",
-        category:    "창작 만화 <할머니>",
-        subtitle:    "창작 만화 <할머니>",
-        year:        "2024",
-        tags:        ["illustration"],
-        teammates:   null,
-        content:     { leftCol: ["깊은 정을 쌓은 가정부와 이별하는 이야기를 어린아이의 시선으로 그려낸 단편 만화."], rightCol: ["A short-form comic capturing a child’s perspective on parting with a beloved housekeeper after forming a deep emotional bond."] },
-        imageBlocks: [
-            { layout: "full-bleed", hero: true,  count: 1, images: ["./projects/grandma/1.png"] },
-            { layout: "full-bleed", hero: false, count: 1, images: ["./projects/grandma/2.jpg"] },
-        ],
-        thumbnail16x9: "./projects/grandma/thumb2.png",
-        thumbnail9x16: "./projects/grandma/thumb.png",
-        websiteLink: null,
-        url:         "./project.html?id=grandma"
-    },
     
+    {
+        id:          "puresoon",
+        title:       "PUReSOON",
+        category:    "불결을 판매하는 브랜드",
+        subtitle:    "불결을 판매하는 브랜드",
+        year:        "2025",
+        tags:        ["identity", "editorial", "typography"],
+        teammates:   null,
+        content:     { leftCol: ["PUReSOON은 오물을 통한 건강을 표방하는 쇼핑 플랫폼 퓨어순이지만, 내적으로는 불순 프로젝트로 작동한다.", "이 프로젝트의 목표는 티끌 없는 정원을 만들고자 하는 욕망이 얼마나 비자연적이고 모순적인지 드러내는 데 있다. 자연의 상을 추구하는 동시에 유익한 부분만을 선별적으로 추출하려는 병리적 욕망을 통제된 순수라는 컨셉으로 보여주려고 한다.", "포장에 능한 이 쇼핑몰은 외관상으로는 유익한 제품을 판매하는 것처럼 보인다. 하지만 한 걸음 물러나 바라보면 이곳은 과잉청결의 미학을 실현하는 공간이며, 도시인이 가진 위생 강박의 연장선 상에 있다.", "따라서, 퓨어순은 과잉청결에 익숙한 도시 거주자를 대상으로 자연 상태의 면역 복원이라는 가치를 지닌 제품을 제공한다. 퓨어순은 걱정 없는 더러움을 판매한다."], rightCol: ["While PUReSOON presents itself as a shopping platform advocating health through 'filth,' internally, it functions as the 'Impure Project.","The objective of this project is to expose the unnatural and contradictory nature of the desire to create a spotless garden. By presenting the concept of 'controlled purity,' it aims to reveal the pathological urge to pursue an image of nature while selectively extracting only its beneficial parts.","Expertly packaged, this shopping mall appears to sell wholesome products on the surface. However, stepping back reveals a space that realizes the aesthetics of hyper-cleanliness—an extension of the urbanite's obsession with hygiene.","Accordingly, PUReSOON provides products with the value of restoring one's natural immunity to city dwellers accustomed to hyper-cleanliness. PUReSOON sells 'carefree dirt.'"] },
+        imageBlocks: [
+            { layout: "full-bleed", hero: true,  count: 1, images: ["./projects/puresoon/1.jpg"] },
+            { layout: "full-bleed", hero: false, count: 1, images: ["./projects/puresoon/2.mp4"] },
+            { layout: "spacer", size: "xl" },
+            { layout: "padded", hero: false, count: 3, images: ["./projects/puresoon/3.jpg", "./projects/puresoon/4.jpg", "./projects/puresoon/5.jpg"] },
+            { layout: "padded", hero: false, count: 3, images: ["./projects/puresoon/6.jpg", "./projects/puresoon/7.jpg", "./projects/puresoon/8.jpg"] },
+            { layout: "padded", hero: false, count: 2, images: ["./projects/puresoon/9.jpg", "./projects/puresoon/10.jpg"] },
+        ],
+        thumbnail16x9: "./projects/puresoon/thumb2.png",
+        thumbnail9x16: "./projects/puresoon/thumb.png",
+        websiteLink: null,
+        url:         "./project.html?id=puresoon"
+    },
+
     {
         id:          "SNUDcatalog",
         title:       "25 SNUD CATALOG",
@@ -340,10 +371,11 @@ export const projects = [
         teammates:   null,
         content:     { leftCol: [], rightCol: [] },
         imageBlocks: [
-            { layout: "full-bleed", hero: false,  count: 2, images: ["./projects/25kms/1.jpg", "./projects/25kms/2.jpg"] },
+            { layout: "full-bleed", hero: true,  count: 1, images: ["./projects/25kms/1.jpg"] },
+            { layout: "full-bleed", hero: false,  count: 1, images: ["./projects/25kms/2.jpg"] },
             { layout: "full-bleed", hero: false, count: 1, images: ["./projects/25kms/3.gif"] },
         ],
-        thumbnail16x9: "./projects/25kms/썸네일2.jpg",
+        thumbnail16x9: "./projects/25kms/thumb2.jpg",
         thumbnail9x16: "./projects/25kms/thumb.jpg",
         websiteLink: null,
         url:         "./project.html?id=25kms"
@@ -392,51 +424,24 @@ export const projects = [
         url:         "./project.html?id=sac"
     },
     
+    
     {
-        id:          "puresoon",
-        title:       "PUReSOON",
-        category:    "불결을 판매하는 브랜드",
-        subtitle:    "불결을 판매하는 브랜드",
-        year:        "2025",
-        tags:        ["identity", "editorial", "typography"],
+        id:          "grandma",
+        title:       "GRANDMOTHER",
+        category:    "창작 만화 <할머니>",
+        subtitle:    "창작 만화 <할머니>",
+        year:        "2024",
+        tags:        ["illustration"],
         teammates:   null,
-        content:     { leftCol: ["PUReSOON은 오물을 통한 건강을 표방하는 쇼핑 플랫폼 퓨어순이지만, 내적으로는 불순 프로젝트로 작동한다.", "이 프로젝트의 목표는 티끌 없는 정원을 만들고자 하는 욕망이 얼마나 비자연적이고 모순적인지 드러내는 데 있다. 자연의 상을 추구하는 동시에 유익한 부분만을 선별적으로 추출하려는 병리적 욕망을 통제된 순수라는 컨셉으로 보여주려고 한다.", "포장에 능한 이 쇼핑몰은 외관상으로는 유익한 제품을 판매하는 것처럼 보인다. 하지만 한 걸음 물러나 바라보면 이곳은 과잉청결의 미학을 실현하는 공간이며, 도시인이 가진 위생 강박의 연장선 상에 있다.", "따라서, 퓨어순은 과잉청결에 익숙한 도시 거주자를 대상으로 자연 상태의 면역 복원이라는 가치를 지닌 제품을 제공한다. 퓨어순은 걱정 없는 더러움을 판매한다."], rightCol: ["While PUReSOON presents itself as a shopping platform advocating health through 'filth,' internally, it functions as the 'Impure Project.","The objective of this project is to expose the unnatural and contradictory nature of the desire to create a spotless garden. By presenting the concept of 'controlled purity,' it aims to reveal the pathological urge to pursue an image of nature while selectively extracting only its beneficial parts.","Expertly packaged, this shopping mall appears to sell wholesome products on the surface. However, stepping back reveals a space that realizes the aesthetics of hyper-cleanliness—an extension of the urbanite's obsession with hygiene.","Accordingly, PUReSOON provides products with the value of restoring one's natural immunity to city dwellers accustomed to hyper-cleanliness. PUReSOON sells 'carefree dirt.'"] },
+        content:     { leftCol: ["깊은 정을 쌓은 가정부와 이별하는 이야기를 어린아이의 시선으로 그려낸 단편 만화."], rightCol: ["A short-form comic capturing a child’s perspective on parting with a beloved housekeeper after forming a deep emotional bond."] },
         imageBlocks: [
-            { layout: "full-bleed", hero: true,  count: 1, images: ["./projects/puresoon/1.jpg"] },
-            { layout: "full-bleed", hero: false, count: 1, images: ["./projects/puresoon/2.mp4"] },
-            { layout: "spacer", size: "xl" },
-            { layout: "padded", hero: false, count: 1, images: ["./projects/puresoon/3.jpg"] },
-            { layout: "padded", hero: false, count: 1, images: ["./projects/puresoon/4.jpg"] },
-            { layout: "spacer", size: "xl" },
-
-            { layout: "padded", hero: false, count: 1, images: ["./projects/puresoon/5.jpg"] },
-            { layout: "padded", hero: false, count: 3, images: ["./projects/puresoon/6.jpg", "./projects/puresoon/7.jpg", "./projects/puresoon/8.jpg"] },
-            { layout: "padded", hero: false, count: 2, images: ["./projects/puresoon/9.jpg", "./projects/puresoon/10.jpg"] },
+            { layout: "full-bleed", hero: true,  count: 1, images: ["./projects/grandma/1.png"] },
+            { layout: "full-bleed", hero: false, count: 1, images: ["./projects/grandma/2.jpg"] },
         ],
-        thumbnail16x9: "./projects/puresoon/thumb2.png",
-        thumbnail9x16: "./projects/puresoon/thumb.png",
+        thumbnail16x9: "./projects/grandma/thumb2.png",
+        thumbnail9x16: "./projects/grandma/thumb.png",
         websiteLink: null,
-        url:         "./project.html?id=puresoon"
-    },
-    
-    
-    {
-        id:          "img-objectifier",
-        title:       "IMG OBJECTIFIER",
-        category:   "객관적 이미지 분석 웹사이트",
-        subtitle:    "객관적 이미지 분석 웹사이트",
-        year:        "2025",
-        tags:        ["website", "creative-coding"],
-        teammates:   null,
-        content:     { leftCol: ["“이미지를 객관적으로 바라보는 것이 가능할까?”라는 질문에서 시작된 본 웹사이트는 시각물의 구조와 초점을 AI의 시선으로 재해석하는 웹 기반 분석 도구입니다. 사진, 포스터, 영상 썸네일 등 사용자가 선택한 시각 요소에서 인간의 주의력이 집중되는 지점을 계산하여 Saliency Map으로 시각화합니다." , "OpenCV와 Deepgaze 라이브러리를 활용하여 객체 감지 및 시각적 중심선, 형태 추상화 등의 데이터를 추출하며, 이미지를 '보는 방식'을 탐구합니다. 창작자는 이 웹사이트를 통해 자신이 의도한 대로 이미지가 받아들여지는지 일차적으로 검토할 수 있습니다."], rightCol: ["Starting with the question, 'Is it possible to look at images more objectively?', this website is a web-based analysis tool that reinterprets the structure and focus of visuals through the lens of AI. It calculates where human attention is concentrated within user-selected elements—such as photos, posters, and video thumbnails—and visualizes these areas through Saliency Maps.", "By utilizing the OpenCV and Deepgaze libraries, the tool extracts data such as object detection, visual center lines, and shape abstraction to explore the fundamental ways we 'see' images. Through this website, creators can perform a primary review of whether their images are being perceived as intended."] },
-        imageBlocks: [
-            { layout: "full-bleed", hero: true,  count: 1, images: ["./projects/img-objectifier/1.png"] },
-            { layout: "full-bleed", hero: false, count: 2, images: ["./projects/img-objectifier/2.png", "./projects/img-objectifier/3.png"] },
-        ],
-        thumbnail16x9: "./projects/img-objectifier/thumb2.png",
-        thumbnail9x16: "./projects/img-objectifier/thumb.png",
-        websiteLink: "https://image-objctifier.onrender.com/",
-        url:         "./project.html?id=img-objectifier"
+        url:         "./project.html?id=grandma"
     }
     
 ];

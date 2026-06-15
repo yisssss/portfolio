@@ -699,12 +699,12 @@ const metaballMaterial = new THREE.ShaderMaterial({transparent: true, uniforms: 
                 finalRgb = mix(neutralBase, blendedBase, clamp(maxBaseMask, 0.0, 1.0));
             }
 
-            if (checkerPaintMask > 0.001) {
-                finalRgb = mix(finalRgb, checkerRgb, clamp(checkerPaintMask, 0.0, 1.0));
-            }
-
             if (crossMask > 0.001) {
                 finalRgb = mix(finalRgb, crossColor.rgb, clamp(crossMask, 0.0, 1.0));
+            }
+
+            if (checkerPaintMask > 0.001) {
+                finalRgb = mix(finalRgb, checkerRgb, clamp(checkerPaintMask, 0.0, 1.0));
             }
 
             if (halftoneMask > 0.001) {

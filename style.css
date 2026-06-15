@@ -967,16 +967,22 @@ body {
     object-fit: cover;
 }
 
-/* hero 블록: 뷰포트 높이를 채우는 대형 이미지 */
+/* hero 블록: 뷰포트 높이를 채우되 이미지는 잘리지 않고 축소 배치 */
 .img-block--hero .img-block__img {
     aspect-ratio: auto;
+    min-height: var(--hero-viewport-height, calc(100vh - 200px));
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .img-block--hero .img-block__img img,
 .img-block--hero .img-block__img video {
-    width: 100%;
-    height: calc(100vh - 200px);
-    object-fit: cover;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: var(--hero-viewport-height, calc(100vh - 200px));
+    object-fit: contain;
 }
 
 /* spacer */
@@ -1391,11 +1397,18 @@ body {
         margin-right: calc(50% - 50vw);
     }
 
+    .img-block--hero .img-block__img {
+        min-height: var(--hero-viewport-height, 50svh);
+    }
+
     .img-block--hero .img-block__img img,
     .img-block--hero .img-block__img video {
-        width: 100vw;
+        width: auto;
+        max-width: 100vw;
         height: auto;
+        max-height: var(--hero-viewport-height, 50svh);
         min-height: 0;
+        object-fit: contain;
     }
 
     .img-block__grid--count-2,

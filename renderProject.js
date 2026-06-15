@@ -88,6 +88,106 @@ function renderIntroMeta(p) {
 //    images : string[]                  — 이미지 경로 (없으면 null → 플레이스홀더)
 //  }
 
+function extractDominantColorFromMedia(mediaEl) {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d", {willReadFrequently: true});
+    if (!ctx) return null;
+
+    const w = mediaEl.naturalWidth || mediaEl.videoWidth;
+    const h = mediaEl.naturalHeight || mediaEl.videoHeight;
+    if (!w || !h) return null;
+
+    const sampleSize = 128;
+    canvas.width = sampleSize;
+    canvas.height = sampleSize;
+
+    try {
+        ctx.drawImage(mediaEl, 0, 0, sampleSize, sampleSize);
+    } catch {
+        return null;
+    }
+
+    const {data} = ctx.getImageData(0, 0, sampleSize, sampleSize);
+    const buckets = new Map();
+
+    for (let i = 0; i < data.length; i += 4) {
+        const r = data[i];
+        const g = data[i + 1];
+        const b = data[i + 2];
+        const a = data[i + 3];
+
+        if (a < 128) continue;
+
+        const bucketKey = (r >> 4) << 8 | (g >> 4) << 4 | (b >> 4);
+        const exactKey = (r << 16) | (g << 8) | b;
+
+        let bucket = buckets.get(bucketKey);
+        if (!bucket) {
+            bucket = {count: 0, exactCounts: new Map()};
+            buckets.set(bucketKey, bucket);
+        }
+
+        bucket.count += 1;
+        bucket.exactCounts.set(exactKey, (bucket.exactCounts.get(exactKey) || 0) + 1);
+    }
+
+    if (!buckets.size) return null;
+
+    let bestBucket = null;
+    let bestBucketCount = 0;
+
+    for (const bucket of buckets.values()) {
+        if (bucket.count > bestBucketCount) {
+            bestBucketCount = bucket.count;
+            bestBucket = bucket;
+        }
+    }
+
+    let bestExactKey = 0;
+    let bestExactCount = 0;
+
+    for (const [exactKey, count] of bestBucket.exactCounts) {
+        if (count > bestExactCount) {
+            bestExactCount = count;
+            bestExactKey = exactKey;
+        }
+    }
+
+    const dr = (bestExactKey >> 16) & 255;
+    const dg = (bestExactKey >> 8) & 255;
+    const db = bestExactKey & 255;
+
+    return `rgb(${dr}, ${dg}, ${db})`;
+}
+
+function applyHeroBackgroundColor(cell, mediaEl) {
+    const apply = () => {
+        const color = extractDominantColorFromMedia(mediaEl);
+        if (color) cell.style.backgroundColor = color;
+    };
+
+    if (mediaEl.tagName === "IMG") {
+        if (mediaEl.complete && mediaEl.naturalWidth) {
+            apply();
+        } else {
+            mediaEl.addEventListener("load", apply, {once: true});
+        }
+        return;
+    }
+
+    if (mediaEl.tagName === "VIDEO") {
+        const run = () => {
+            if (mediaEl.videoWidth) apply();
+        };
+
+        if (mediaEl.readyState >= 2) {
+            run();
+        } else {
+            mediaEl.addEventListener("loadeddata", run, {once: true});
+        }
+    }
+}
+
 function applyIntrinsicFlexRatio(cell, mediaEl) {
     const apply = () => {
         const w = mediaEl.naturalWidth || mediaEl.videoWidth;
@@ -183,18 +283,22 @@ function renderImageBlocks(imageBlocks) {
 
                     cell.appendChild(video);
 
-                    if (count > 1 && useRatioFit) {
+                    if (block.hero) {
+                        applyHeroBackgroundColor(cell, video);
+                    } else if (count > 1 && useRatioFit) {
                         applyIntrinsicFlexRatio(cell, video);
                     }
                 } else {
                     const img = document.createElement("img");
                     img.src  = src;
                     img.alt  = "";
-                    img.loading = "lazy";
+                    img.loading = block.hero ? "eager" : "lazy";
 
                     cell.appendChild(img);
 
-                    if (count > 1 && useRatioFit) {
+                    if (block.hero) {
+                        applyHeroBackgroundColor(cell, img);
+                    } else if (count > 1 && useRatioFit) {
                         applyIntrinsicFlexRatio(cell, img);
                     }
                 }
