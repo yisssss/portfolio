@@ -301,7 +301,7 @@ export const projects = [
         category:    "전시 웹사이트 제작",
         subtitle:    "전시 웹사이트 제작",
         year:        "2025",
-        tags:        ["identity", "website", "typography", "exhibition"],
+        tags:        ["identity", "website", "exhibition"],
         teammates:   ["조은별 CHO Enbyeol", "김경민 KIM Kyeongmin"],
         content:     { leftCol: ["2025 SNU PATCHWORK 전시에 디자인 소모임 GRAPH 팀으로 참여했다. '여름 파티'라는 테마 아래, 관객을 환영하는 다양한 형태의 ‘초대장’을 비주얼 모티프로 설정하여 전시 전반의 아이덴티티를 구축했다. 전시 준비위원회로서 아이덴티티 기획부터 동선 설계, 참여자 9인의 작품 디스플레이까지 전시의 전 과정을 조율하며 다양한 색깔이 넘치는 작품에 한 팀이라는 통일성을 부여하기 위해 노력했다.", "기존의 종이 도록을 대신하여 각 작품의 상세 정보를 담은 인터랙티브 캡션 웹사이트를 직접 제작하고 퍼블리싱했다. 이는 전시의 디지털 아카이브로 이어졌다."], rightCol: ["I participated in the 2025 SNU PATCHWORK exhibition as a member of the design group 'GRAPH.' Under the theme of a Summer Party, I established the overall exhibition identity by utilizing various forms of 'invitations' as the core visual motif. As a member of the organizing committee, I coordinated the entire process—from visual branding and spatial flow planning to the final display of works by nine different artists—striving to provide a unified team identity to a diverse collection of individual styles.", "A key part of this project was the development and publishing of an interactive caption website that replaced traditional printed catalogs. I designed the website's structure and layout to mirror the physical exhibition's flow, which naturally extended into a permanent digital archive. By bridging the gap between physical and digital spaces, I offered visitors a seamless and tech-driven viewing experience."] },
         imageBlocks: [
@@ -558,3 +558,46 @@ export const TAG_INDEX_MAP = TAG_KEYS.reduce((acc, tag, index) => {
 }, {});
 
 export const TAG_STYLE_IDS = TAG_KEYS.map((tag) => STYLE_ENUMS[tagConfigs[tag].styleType] ?? STYLE_ENUMS.default);
+
+/** 태그 칩 PNG 베이크: 기본 블롭 반지름(px). `scale 1`일 때 현재와 동일한 크기. */
+export const TAG_CHIP_BLOB_RADIUS_BASE = 44;
+
+/**
+ * 태그별 블롭 실루엣만 축소 (1 = BASE 그대로).
+ * checker 10px 격자·halftone spacing·line 픽셀 스냅 등 텍스쳐 픽셀 크기는 변하지 않음.
+ */
+export const tagChipBlobScale = {
+    identity: 0.58,
+    editorial: 0.42,
+    video: 0.42
+};
+
+/** @param {string} tagKey */
+export function getTagChipBlobRadius(tagKey) {
+    const scale = tagChipBlobScale[tagKey] ?? 1;
+    return TAG_CHIP_BLOB_RADIUS_BASE * scale;
+}
+
+/**
+ * 태그 칩 PNG 베이크 후 전체 내용 확대 (1 = 그대로).
+ * 블롭·텍스쳐·line 경계 모두 동일 비율로 커짐.
+ */
+export const tagChipExportScale = {
+    editorial: 1.5,
+    illustration: 1.2,
+    "creative-coding": 1.2
+};
+
+/** @param {string} tagKey */
+export function getTagChipExportScale(tagKey) {
+    return tagChipExportScale[tagKey] ?? 1;
+}
+
+/**
+ * 태그 칩 line 베이크: 경계 요소(화살표·dash) 개수 배율. 0.5 = 절반.
+ * 메인 씬 SVG와 별도.
+ */
+export const tagChipLineDetailScale = {
+    exhibition: 0.5,
+    typography: 0.5
+};

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tag Chip Export</title>
+    <style>
+        :root {
+            color-scheme: light;
+            font-family: "DM Mono", ui-monospace, monospace;
+            background: #f2f2f2;
+            color: #111;
+        }
+
+        body {
+            margin: 0;
+            padding: 32px 24px 64px;
+        }
+
+        h1 {
+            margin: 0 0 8px;
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .intro {
+            max-width: 720px;
+            margin: 0 0 24px;
+            line-height: 1.6;
+            font-size: 13px;
+        }
+
+        .intro code {
+            font: inherit;
+            background: rgba(0, 0, 0, 0.06);
+            padding: 1px 4px;
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 28px;
+        }
+
+        button,
+        a.back {
+            appearance: none;
+            border: 1px solid #111;
+            background: #111;
+            color: #fff;
+            font: inherit;
+            font-size: 12px;
+            padding: 10px 14px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        button.secondary,
+        a.back {
+            background: transparent;
+            color: #111;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 16px;
+        }
+
+        .card {
+            background: #fff;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            padding: 12px;
+        }
+
+        .preview {
+            width: 128px;
+            height: 128px;
+            margin: 0 auto 10px;
+            background:
+                linear-gradient(45deg, #ddd 25%, transparent 25%),
+                linear-gradient(-45deg, #ddd 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #ddd 75%),
+                linear-gradient(-45deg, transparent 75%, #ddd 75%);
+            background-size: 16px 16px;
+            background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+            display: grid;
+            place-items: center;
+        }
+
+        .preview canvas {
+            width: 128px;
+            height: 128px;
+            image-rendering: pixelated;
+        }
+
+        .tag-name {
+            font-size: 12px;
+            text-transform: lowercase;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .card button {
+            width: 100%;
+            background: transparent;
+            color: #111;
+        }
+
+        .status {
+            margin-top: 16px;
+            font-size: 12px;
+            min-height: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <h1>Tag Chip PNG Export</h1>
+    <p class="intro">
+        태그 칩용 블롭 썸네일을 128×128 PNG로 내보냅니다. fill 태그는 메인 셰이더 블롭을, line 태그는 메인 씬 SVG 경계선을
+        래스터화합니다. 블롭 실루엣 크기는 <code>data.js</code>의 <code>tagChipBlobScale</code>로 태그별 조정 가능하며,
+        텍스쳐 픽셀 격자(10px)는 그대로 유지됩니다. 다운로드한 파일을
+        <code>assets/tag-chips/{태그키}.png</code>에 덮어쓰면 사이트에 바로 반영됩니다.
+    </p>
+
+    <div class="actions">
+        <button type="button" id="download-all">전체 PNG 다운로드</button>
+        <a class="back secondary" href="./index.html">← 메인으로</a>
+    </div>
+
+    <div class="grid" id="grid"></div>
+    <p class="status" id="status" aria-live="polite"></p>
+
+    <script type="module">
+        import {
+            bakeTagChip,
+            downloadAllTagChips,
+            downloadTagChip,
+            getTagChipAssetPath,
+            TAG_CHIP_EXPORT_SIZE,
+            TAG_KEYS
+        } from "./tagChipBake.js";
+
+        async function init() {
+        const grid = document.getElementById("grid");
+        const status = document.getElementById("status");
+
+        for (const tag of TAG_KEYS) {
+            const card = document.createElement("article");
+            card.className = "card";
+
+            const preview = document.createElement("div");
+            preview.className = "preview";
+
+            const canvas = await bakeTagChip(tag, TAG_CHIP_EXPORT_SIZE);
+            preview.append(canvas);
+
+            const name = document.createElement("p");
+            name.className = "tag-name";
+            name.textContent = tag;
+
+            const button = document.createElement("button");
+            button.type = "button";
+            button.textContent = `${tag}.png 저장`;
+            button.addEventListener("click", async () => {
+                await downloadTagChip(tag);
+                status.textContent = `${getTagChipAssetPath(tag)} 로 저장 후 덮어쓰세요.`;
+            });
+
+            card.append(preview, name, button);
+            grid.append(card);
+        }
+
+        document.getElementById("download-all").addEventListener("click", async () => {
+            status.textContent = "다운로드 중…";
+            await downloadAllTagChips();
+            status.textContent = `완료. ${TAG_KEYS.length}개 파일을 assets/tag-chips/ 에 넣어주세요.`;
+        });
+        }
+
+        init();
+    </script>
+</body>
+</html>

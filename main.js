@@ -1707,9 +1707,15 @@ function initTagRail() {
     updateTagChipActiveState(null);
 }
 
+function initTagChipAssets() {
+    TAG_KEYS.forEach((tag) => {
+        state.tagThumbnails[tag] = `./assets/tag-chips/${tag}.png`;
+    });
+}
+
 function initSiteChrome() {
     initTagRail();
-    generateTagThumbnails();
+    initTagChipAssets();
     initWorkGrid();
     initScrollBehavior();
 }
@@ -2468,204 +2474,6 @@ function updateTagChipActiveState(filter) {
             chip.style.removeProperty("--thumb-url");
         }
     });
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   TAG THUMBNAIL GENERATION (Offscreen Canvas → base64)
-═══════════════════════════════════════════════════════════════ */
-
-/** 앱 초기화 시 각 태그의 원형 패턴 썸네일을 base64 PNG로 생성해 state.tagThumbnails에 저장. */
-function generateTagThumbnails() {
-    const size = 80;
-
-    TAG_KEYS.forEach((tag) => {
-        try {
-            state.tagThumbnails[tag] = drawTagThumbnail(tag, size);
-        } catch (e) {
-            /* eslint-disable-next-line no-console */
-            console.warn("[thumbnail]", tag, e);
-        }
-    });
-}
-
-/**
- * 하나의 태그에 대해 offscreen canvas에 원형 패턴을 그리고 base64 dataURL을 반환.
- * @param {string} tagKey
- * @param {number} size   캔버스 한 변 크기(px)
- * @returns {string} base64 PNG dataURL
- */
-function drawTagThumbnail(tagKey, size) {
-    const canvas = document.createElement("canvas");
-
-    canvas.width = size;
-    canvas.height = size;
-
-    const ctx = canvas.getContext("2d");
-    const v = getMergedShaderVisual(tagKey);
-    const cfg = tagConfigs[tagKey];
-    const cx = size / 2;
-    const cy = size / 2;
-    const r = size / 2 - 0.5;
-
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(cx, cy, r, 0, Math.PI * 2);
-    ctx.clip();
-
-    switch (cfg.styleType) {
-        case "default":
-            drawThumbGradient(ctx, size, v.colors.defaultFill, v.colors.defaultFillOuter);
-            break;
-        case "tinted-default-fill":
-            drawThumbGradient(ctx, size, v.colors.tintDefaultFill, v.colors.tintDefaultFillOuter);
-            break;
-        case "halftone":
-            drawThumbHalftone(ctx, size, v.colors.halftonePaper, v.colors.halftoneInk);
-            break;
-        case "pixel-line":
-            drawThumbPixelLines(ctx, size, v.line.stroke);
-            break;
-        case "arrow-line":
-            drawThumbArrowLines(ctx, size, v.line.stroke);
-            break;
-        case "default-dash":
-            drawThumbDashLines(ctx, size, v.line.stroke, cfg.dash, cfg.strokeWidth);
-            break;
-        case "pixel-cross":
-            drawThumbPixelCross(ctx, size, v.colors.crossInk);
-            break;
-        case "checkerboard":
-            drawThumbCheckerboard(ctx, size, v.colors.checkerLight, v.colors.checkerDark);
-            break;
-        default:
-            ctx.fillStyle = "#cccccc";
-            ctx.fillRect(0, 0, size, size);
-    }
-
-    ctx.restore();
-
-    return canvas.toDataURL("image/png");
-}
-
-function drawThumbGradient(ctx, size, inner, outer) {
-    const grad = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
-
-    grad.addColorStop(0, inner || "#ffffff");
-    grad.addColorStop(1, outer || "#cccccc");
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, size, size);
-}
-
-function drawThumbHalftone(ctx, size, paper, ink) {
-    ctx.fillStyle = paper || "#ffffff";
-    ctx.fillRect(0, 0, size, size);
-    ctx.fillStyle = ink || "#000000";
-    const spacing = size / 9;
-    const dotR = spacing * 0.28;
-
-    for (let row = -1; row < 11; row++) {
-        const offset = row % 2 === 0 ? 0 : spacing / 2;
-
-        for (let col = -1; col < 11; col++) {
-            ctx.beginPath();
-            ctx.arc(col * spacing + offset, row * spacing, dotR, 0, Math.PI * 2);
-            ctx.fill();
-        }
-    }
-}
-
-function drawThumbCheckerboard(ctx, size, light, dark) {
-    const cell = size / 8;
-
-    for (let row = 0; row < 9; row++) {
-        for (let col = 0; col < 9; col++) {
-            ctx.fillStyle = (row + col) % 2 === 0 ? (light || "#ffffff") : (dark || "#000000");
-            ctx.fillRect(col * cell, row * cell, cell, cell);
-        }
-    }
-}
-
-function drawThumbPixelCross(ctx, size, ink) {
-    ctx.fillStyle = "#f2f2f2";
-    ctx.fillRect(0, 0, size, size);
-    ctx.fillStyle = ink || "#ff0000";
-    const cell = size / 7;
-    const armLen = cell * 0.42;
-    const thick = Math.max(1.5, cell * 0.18);
-
-    for (let row = 0; row < 8; row++) {
-        for (let col = 0; col < 8; col++) {
-            const px = (col + 0.5) * cell;
-            const py = (row + 0.5) * cell;
-
-            ctx.fillRect(px - thick / 2, py - armLen, thick, armLen * 2);
-            ctx.fillRect(px - armLen, py - thick / 2, armLen * 2, thick);
-        }
-    }
-}
-
-function drawThumbPixelLines(ctx, size, lineColor) {
-    ctx.fillStyle = "#f2f2f2";
-    ctx.fillRect(0, 0, size, size);
-    ctx.strokeStyle = lineColor || "#000000";
-    ctx.lineWidth = 2;
-    const step = size / 8;
-
-    for (let x = step / 2; x < size + 1; x += step) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, size);
-        ctx.stroke();
-    }
-}
-
-function drawThumbDashLines(ctx, size, lineColor, dash, strokeWidth) {
-    ctx.fillStyle = "#f2f2f2";
-    ctx.fillRect(0, 0, size, size);
-    ctx.strokeStyle = lineColor || "#000000";
-    ctx.lineWidth = Math.min(strokeWidth || 3, 6);
-    const dashArr = dash === "1 15"
-        ? [2, 11]
-        : dash === "3 6"
-            ? [4, 7]
-            : [];
-
-    ctx.setLineDash(dashArr);
-    const step = size / 6;
-
-    for (let y = step / 2; y < size; y += step) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(size, y);
-        ctx.stroke();
-    }
-
-    ctx.setLineDash([]);
-}
-
-function drawThumbArrowLines(ctx, size, lineColor) {
-    ctx.fillStyle = "#f2f2f2";
-    ctx.fillRect(0, 0, size, size);
-    ctx.strokeStyle = lineColor || "#000000";
-    ctx.lineWidth = 1.5;
-    const step = size / 5;
-    const ah = 5;
-
-    for (let y = step / 2; y < size; y += step) {
-        ctx.setLineDash([4, 6]);
-        ctx.beginPath();
-        ctx.moveTo(2, y);
-        ctx.lineTo(size - 14, y);
-        ctx.stroke();
-        ctx.setLineDash([]);
-        ctx.beginPath();
-        ctx.moveTo(size - 14, y - ah);
-        ctx.lineTo(size - 4, y);
-        ctx.lineTo(size - 14, y + ah);
-        ctx.stroke();
-    }
-
-    ctx.setLineDash([]);
 }
 
 /* ════════════════════════════════════════
